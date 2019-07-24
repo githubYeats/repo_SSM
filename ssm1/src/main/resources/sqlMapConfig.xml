@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!--
+    【1】 先配MyBatis
+			首先把映射文件写好
+			然后，编写sqlMapConfig.xml
+				<1> 加载外部配置文件：jdbc.properties 	<properties>标签
+				<2> 配置别名						<typeAliases>标签，可一个一个配置，也可扫包
+				<3> 配置“环境”：数据源 					<environments>标签
+				<4> 加载映射文件：各Mapper.xml 	<mappers>标签，可一个一个加载，也可扫包
+
+				约束文件中规定了各标签配置的顺序：（按序提取部分）
+				properties->typeAliases->typeHandlers->plugins->environments->mappers
+    -->
+
+    <!--加载properties文件-->
+    <properties resource="jdbc.properties"/>
+
+    <!--配置别名
+        ##为POJO类配置别名，简化映射文件Mapper.xml中的书写
+    -->
+    <typeAliases>
+        <!--一个一个配置
+            自己一个一个配置，如果Mapper接口特别多时，不方便。
+            但自己配置时，可以指定别名名字。
+        -->
+        <!--<typeAlias type="cn.leap.mapper.AccountMapper" alias="User"/>-->
+
+        <!--扫包，框架自动配置
+            默认配置的别名，是接口名首字母改成小写后的名字
+                如：AccountMapper => accountMapper
+        -->
+        <package name="cn.leap.pojo"/>
+    </typeAliases>
+
+    <!--数据源环境-->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--加载映射文件-->
+    <mappers>
+        <!--一个一个加载-->
+        <!--<mapper resource="cn/leap/mapper/AccountMapper.xml"/>-->
+
+        <!--扫包加载-->
+        <package name="cn.leap.mapper"/>
+    </mappers>
+</configuration>

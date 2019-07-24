@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+                ">
+
+    <!--组件扫描
+        Spring框架扫dao层与service层就可以了！
+            type: 需要排除的类型   注解
+            expression：要排除哪个注解
+        用@Controller来注解的地方，Spring框架就不扫描了。因为Controller已由SpringMVC扫描了。
+
+        那能不能SpringMVC不扫描，让Spring统一来扫描呢？【答：不行】
+            必须让SpringMVC框架自己去扫描controller，
+            才能让web层用SpringMVC框架的方式来处理http请求与响应！
+    -->
+    <context:component-scan base-package="cn.leap">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+</beans>

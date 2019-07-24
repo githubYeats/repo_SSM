@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.leap.mapper.AccountMapper"><!--AccountMapper接口的全限定名-->
+
+    <!--
+    void addNewAccount(Account account);
+
+    id: 对应Mapper接口中的方法名
+    parameterType: 参数类型，对应Mapper接口形参类型
+        可以写全限定名
+        若在sqlMapConfig.xml中配置了“别名”后，可以写别名
+        【参数类型可以不写，框架会自动识别】
+    #{id},#{name},#{money}  MyBaits要求的占位符语法。  名字需要与POJO类的属性名相同
+    -->
+    <insert id="addNewAccount" parameterType="cn.leap.pojo.Account">
+        insert into t_account values(#{id},#{name},#{money})
+    </insert>
+
+
+    <!--
+    List<Account> findAllAccount();
+    -->
+    <select id="findAllAccount" resultType="cn.leap.pojo.Account">
+        select * from t_account
+    </select>
+
+</mapper>
