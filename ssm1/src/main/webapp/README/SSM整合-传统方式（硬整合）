@@ -1,0 +1,158 @@
+SSM整合--传统方式（硬整合）
+
+1. 创建数据库及表		t_account
+
+2. 创建maven工程，添加web.xml
+
+3. pom.xml中添加基本的配置
+	<!--web项目-->
+    <packaging>war</packaging>
+
+4. 建立项目目录结构（只创建文件，不写内容）
+	=============================
+	java类或接口
+		pojo	mapper	service		controller	utils	等等
+		实体类包常用的名字，如：domain, entity, pojo
+	---------------------
+	外部资源文件
+		jdbc.properties
+		log4j.propertis
+		通用的，直接连带内容一起复制
+	---------------------
+	SSM配置文件
+		Spring			spring.xml 			通常会写成applicationContext.xml
+		SpringMVC		spring-mvc.xml
+		MyBatis 		sqlMapConfig.xml + 各映射文件（**Mapper.xml）
+			映射文件，在resources目录下的存放目录要与Mapper接口对应上
+
+5. pom.xml导入依赖坐标		日志插件的配置文件 log4j.properties，后面再添加
+
+6. 实体类编写		Account类
+
+7. dao层编写			AccountMapper接口
+
+8. service层编写		
+	AccountService接口-------------------------直到这一步，都不需要写任何SSM的配置文件
+
+	AccountServiceImpl实现类	-------------------至此，需要写SSM配置文件了
+		（1）@Service("accountService")，需要Spring框架
+		（2）sqlSession对象创建，需要MyBatis框架
+			SqlSession sqlSession = MyBatisUtils.openSession();
+
+		@Service("accountService")
+		public class AccountServiceImpl implements AccountService {
+		    public void save(Account account) {
+		        SqlSession sqlSession = MyBatisUtils.openSession();
+		        AccountMapper accountMapper = sqlSession.getMapper(AccountMapper.class);
+		        accountMapper.save(account);
+		        sqlSession.commit();
+		        sqlSession.close();
+		    }
+		    public List<Account> findAll() {
+		        SqlSession sqlSession = MyBatisUtils.openSession();
+		        AccountMapper accountMapper = sqlSession.getMapper(AccountMapper.class);
+		        return accountMapper.findAll();
+		    }
+		}
+
+	建议：未集成入SSM框架前，java文件时，都先按SSM标准去写，该写什么写什么！
+		如Spring注解，该加就加，一切按已配置有了SSM框架去写。
+
+
+9. web层	编写			
+	编写Controller类
+
+
+7. 前端页面编写
+	add.jsp			新增账户
+	list.jsp		展示账户信息
+	
+
+8. 配置文件编写
+	----------------------------------------------------------------------------
+	外部资源文件
+		jdbc.properties
+		log4j.propertis
+	-----------------------------------------------------------------------------
+	SSM配置文件
+		Spring			spring.xml 			通常会写成applicationContext.xml
+		SpringMVC		spring-mvc.xml
+		MyBatis 		sqlMapConfig.xml + 各映射文件Mapper.xml
+		-----------------------------------
+		【1】 先配MyBatis
+			首先把映射文件写好
+			然后，编写sqlMapConfig.xml
+				<1> 加载外部配置文件：jdbc.properties 	<properties>标签
+				<2> 配置别名						<typeAliases>标签，可一个一个配置，也可扫包
+				<3> 配置“环境”：数据源 					<environments>标签
+				<4> 加载映射文件：各Mapper.xml 	<mappers>标签，可一个一个加载，也可扫包
+
+			mybatis-3-config.dtd的约束文件，规定了标签配置的顺序，不按顺序是不行的！！
+				<!ELEMENT configuration (properties?, settings?, typeAliases?, typeHandlers?, objectFactory?, objectWrapperFactory?, reflectorFactory?, plugins?, environments?, databaseIdProvider?, mappers?)>
+				
+				可以看到：
+				properties->typeAliases->typeHandlers->plugins->environments->mappers
+				加载配置文件   别名			类型处理器   插件			运行环境  加载映射关系
+		------------------------------------
+		【2】 再配SpringMVC
+			SpringMVC配置中的四大金刚，先给配上
+			<1> 组件扫描					只需扫controller包即可
+			<2> mvc注解驱动				
+			<3> 内部资源视图解析器
+			<4> 静态资源访问权限
+		------------------------------------
+		【3】 再配Spring
+			applicationContext.xml常配的有：
+				组件扫描
+				Spring的JdbcTemplate
+					包数据源DataSource，
+					包括加载jdbc.properties文件
+				Spring事务管理---三剑客-->简化配置：二巨头
+
+
+			<1> 组件扫描		需要扫service层及dao层 	
+				web层由SpringMVC去扫了，SpringMVC本就是Spring的一个子模块，
+				这样一来，也就相当于Spring窗口控制了所有Bean对象。
+	----------------------------------------------------------------------------
+	web项目核心配置文件
+		web.xml
+		web项目集成Spring与SpringMVC框架
+			1）web.xml中配置Spring的监听器
+			2）web.xml中配置SpringMVC的前端控制器
+
+		配置以下内容：
+			<1> 字符编码过滤器 			解决post中文乱码问题
+				get请求中文乱码问题：Tomcat7没有解决，Tomcat8解决了！
+			<2> 全局初始化参数			全局：整个web项目
+			<3> Spring的监听器 			ContextLoaderListener
+			<4> SpringMVC的前端控制器 	DispatcherServlet
+
+9. 页面访问，运行测试	
+	测试项包括：
+		1）新增账户功能
+			请求URL：http://localhost:8080/ssm1/jsp/add.jsp
+			输入账户名，金额，提交后，页面显示响应提示信息："add success"
+		2）查询账户功能
+			请求URL：http://localhost:8080/ssm1/account/findAllAccount
+
+至此，传统方式整合SSM，就完成了！
+
+######################################################################################
+
+传统方式整合SSM的主要问题：----MyBatis与Spring是独立运行的！
+	具体体现在以下两个方面：
+	-----------------------------------------
+	1）service层中，SqlSession对象还是new出来的
+		SqlSession对象，是MyBatis框架的入口！
+		它还是手动创建的，说明SqlSession对象还没有交由Spring窗口管理！
+		-->即：MyBatis还未集成到Spring中去。
+
+     	这也正是传统的SSM整合方式的一大缺点！！
+     	实际上，这只能叫web项目中使用了SSM框架，但并未将SSM三大框架有机整合起来，形成一个整体！
+     	(SpringMVC本就是Spring的一个子模块)
+    -------------------------------------------
+    2）事务还在由MyBatis自己管理
+    	Service层中，SqlSession对象创建时，指定事务提交的方式
+    		SqlSession sqlSession = sqlSessionFactory.openSession(true);//自动提交事务
+
+

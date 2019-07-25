@@ -15,10 +15,6 @@
         <!--设置项目构建使用的字符集-->
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 
-        <!--设置maven编译的版本（目前maven默认使用的是1.5版本）-->
-        <maven.complier.source>1.8</maven.complier.source>
-        <maven.complier.target>1.8</maven.complier.target>
-
         <spring.version>5.0.5.RELEASE</spring.version>
         <mybatis.version>3.4.5</mybatis.version>
 
@@ -74,12 +70,16 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--EL表达式-->
-        <dependency>
+        <!--EL表达式
+            加上它，访问index.jsp时，会报错：
+             javax/servlet/jsp/JspApplicationContext, have different Class objects for
+             the type javax/el/ExpressionFactory used in the signature
+        -->
+        <!--<dependency>
             <groupId>javax.el</groupId>
             <artifactId>javax.el-api</artifactId>
             <version>3.0.0</version>
-        </dependency>
+        </dependency>-->
 
         <!--JSTL标签-->
         <dependency>
@@ -245,7 +245,7 @@
                 <version>2.1</version>
                 <configuration>
                     <port>8080</port>
-                    <path>/</path><!-- 项目虚拟目录-->
+                    <path>/ssm1</path><!-- 项目虚拟目录-->
                     <uriEncoding>UTF-8</uriEncoding>
                     <server>tomcat7</server>
                 </configuration>

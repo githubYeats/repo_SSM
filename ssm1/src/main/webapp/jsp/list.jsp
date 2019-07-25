@@ -13,17 +13,19 @@
     <title>账户信息展示</title>
 </head>
 <body>
-<tr>
-    <th>账户id</th>
-    <th>账户名称</th>
-    <th>账户金额</th>
-</tr>
-<c:forEach items="${accounts}" var="account">
+<table border="1">
     <tr>
-        <td>${account.id}</td>
-        <td>${account.name}</td>
-        <td>${account.money}</td>
+        <th>账户id</th>
+        <th>账户名称</th>
+        <th>账户金额</th>
     </tr>
-</c:forEach>
+    <c:forEach items="${accounts}" var="account">
+        <tr>
+            <td>${account.id}</td>
+            <td>${account.name}</td>
+            <td>${account.money}</td>
+        </tr>
+    </c:forEach>
+</table>
 </body>
 </html>

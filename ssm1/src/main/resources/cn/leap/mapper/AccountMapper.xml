@@ -12,16 +12,16 @@
         【参数类型可以不写，框架会自动识别】
     #{id},#{name},#{money}  MyBaits要求的占位符语法。  名字需要与POJO类的属性名相同
     -->
-    <insert id="addNewAccount" parameterType="cn.leap.pojo.Account">
-        insert into t_account values(#{id},#{name},#{money})
+    <insert id="addNewAccount" parameterType="account">
+        insert into account values(null,#{name},#{money})
     </insert>
 
 
     <!--
     List<Account> findAllAccount();
     -->
-    <select id="findAllAccount" resultType="cn.leap.pojo.Account">
-        select * from t_account
+    <select id="findAllAccount" resultType="account">
+        select * from account
     </select>
 
 </mapper>

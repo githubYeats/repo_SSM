@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -17,6 +18,7 @@ import java.util.List;
  * Desc:
  */
 @Controller //Spring注解，IoC控制
+@RequestMapping("/account")
 public class AccountController {
 
     @Autowired //Spring注解，按类型注入Bean对象
@@ -32,9 +34,10 @@ public class AccountController {
      */
     @RequestMapping("/add") //SpringMVC注解，设置请求路径映射
     @ResponseBody //SpringMVC注解，告知框架，该业务方法不是要做页面跳转，而是回写数据
-    public String addNewAccount(Account account){
+    public String addNewAccount(Account account) throws IOException {
         accountService.addNewAccount(account);
-        return "添加账户成功！";//哪个页面发送的http请求，该提示信息就返回给哪个页面  add.jsp
+        //return "添加账户成功！";//哪个页面发送的http请求，该提示信息就返回给哪个页面  add.jsp
+        return "add success";
     }
 
     /**
@@ -43,11 +46,11 @@ public class AccountController {
      * --取完数据后，要将查询结果返回给前端页面：通过@ResponseBody注解 + ModelAndView对象
      */
     @RequestMapping("/findAllAccount")
-    public ModelAndView findAllAccount(){
+    public ModelAndView findAllAccount() throws IOException {
         ModelAndView mv = new ModelAndView();
         List<Account> accountList = accountService.findAllAccount();
         mv.addObject("accounts",accountList);
-        mv.setViewName("list.jsp");//展示查询结果的页面是list.jsp
+        mv.setViewName("list");//展示查询结果的页面是list.jsp
         return mv;
     }
 }

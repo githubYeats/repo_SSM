@@ -2,6 +2,7 @@ package cn.leap.service;
 
 import cn.leap.pojo.Account;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -15,11 +16,11 @@ public interface AccountService {
      * 添加新账户
      * @param account
      */
-    void addNewAccount(Account account);
+    void addNewAccount(Account account) throws IOException;
 
     /**
      * 查询所有账户
      * @return
      */
-    List<Account> findAllAccount();
+    List<Account> findAllAccount() throws IOException;
 }
