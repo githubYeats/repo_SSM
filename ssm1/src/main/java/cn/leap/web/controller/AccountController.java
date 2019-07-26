@@ -1,10 +1,9 @@
 package cn.leap.web.controller;
 
-import cn.leap.pojo.Account;
+import cn.leap.domain.Account;
 import cn.leap.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -45,7 +44,7 @@ public class AccountController {
      * --接收并处理http请求，从数据库中取数据
      * --取完数据后，要将查询结果返回给前端页面：通过@ResponseBody注解 + ModelAndView对象
      */
-    @RequestMapping("/findAllAccount")
+    @RequestMapping("/list")
     public ModelAndView findAllAccount() throws IOException {
         ModelAndView mv = new ModelAndView();
         List<Account> accountList = accountService.findAllAccount();

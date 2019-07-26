@@ -10,46 +10,11 @@
                 http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
                 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
                 ">
-    <!--
-    【2】 再配SpringMVC
-        SpringMVC配置中的四大金刚，先给配上
-        <1> 组件扫描            只需扫controller包即可
-        <2> mvc注解驱动         可以取代配置的SpringMVC组件中的“处理器映射器”：HandlerMapping
-        <3> 内部资源视图解析器
-        <4> 静态资源访问权限
-    -->
 
     <!--组件扫描-->
     <context:component-scan base-package="cn.leap.web.controller"/>
 
-    <!--【处理器映射器】
-        使得controller中可以接收并处理前端传的json类型参数
-
-        前端页面ajax.jsp中：
-            <script>
-                //准备集合类型的请求参数
-                //var userList = new Array();//js中只有数组
-                var userList = [];//简化写法
-                userList.push({username:"Nick",password:"111"});
-                userList.push({username:"Susi",password:"222"});
-
-                //发送ajax请求
-                $.ajax({
-                    url:"${pageContext.request.contextPath}/user/request5",//请求资源路径
-                    type:"POST",//请求方式
-                    data: JSON.stringify(userList),//【【请求参数是集合类型，转成JSON对象传输】】
-                    contentType:"application/json;charset=utf-8",//指定请求参数的类型
-                    dataType:"json"//指定预期的响应数据类型
-                })
-            </script>
-
-        controller中request5()方法：
-            @RequestMapping("/request5")
-            @ResponseBody
-            public void request5(@RequestBody List<User> userList) {
-                System.out.println(userList);
-            }
-    -->
+    <!--【处理器映射器】-->
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="messageConverters">
             <list>
@@ -59,7 +24,7 @@
     </bean>
 
     <!--mvc注解驱动-->
-    <mvc:annotation-driven/><!--可以取代上面配置的【处理器映射器】，但功能更强大！-->
+    <mvc:annotation-driven/>
 
     <!--内部资源视图解析器-->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -69,19 +34,6 @@
     </bean>
 
     <!--开放静态资源的访问权限-->
-    <!--一处一处指定-->
-    <!--<mvc:resources mapping="/js/**" location="/js/"/>
-    <mvc:resources mapping="/img/**" location="/img/"/>-->
-    <!--指定默认处理器
-        spring-mvc.xsd中指定的Handler
-            即：java:org.springframework.web.servlet.resource.DefaultServletHttpRequestHandler
-
-        其实，这是Tomcat服务器自身所带的默认处理器！
-        它对静态资源的默认处理就是：直接放行！====被拦截者：访问静态资源的http请求  谁拦截的？？
-        =====>拦截者：SpringMVC的前端控制器，即DispatcherServlet。
-        =====DispatcherServlet要在web.xml中配置，web项目中加载了它，就是加载了SpringMVC框架！
-    -->
     <mvc:default-servlet-handler/>
-
 
 </beans>

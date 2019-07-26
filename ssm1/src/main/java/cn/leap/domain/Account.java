@@ -1,4 +1,4 @@
-package cn.leap.pojo;
+package cn.leap.domain;
 
 /**
  * Author: Feiyue

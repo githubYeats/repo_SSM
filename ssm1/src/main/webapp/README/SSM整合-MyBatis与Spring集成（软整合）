@@ -1,0 +1,17 @@
+传统方式整合SSM的主要问题：----MyBatis与Spring是独立运行的！
+	具体体现在以下两个方面：
+	-----------------------------------------
+	1）service层中，SqlSession对象还是new出来的
+		SqlSession对象，是MyBatis框架的入口！
+		它还是手动创建的，说明SqlSession对象还没有交由Spring窗口管理！
+		-->即：MyBatis还未集成到Spring中去。
+
+     	这也正是传统的SSM整合方式的一大缺点！！
+     	实际上，这只能叫web项目中使用了SSM框架，但并未将SSM三大框架有机整合起来，形成一个整体！
+     	(SpringMVC本就是Spring的一个子模块)
+    -------------------------------------------
+    2）事务还在由MyBatis自己管理
+    	Service层中，SqlSession对象创建时，指定事务提交的方式
+    		SqlSession sqlSession = sqlSessionFactory.openSession(true);//自动提交事务
+
+解决上述两个问题！

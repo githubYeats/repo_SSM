@@ -11,17 +11,46 @@
                 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
                 ">
 
-    <!--组件扫描
-        Spring框架扫dao层与service层就可以了！
-            type: 需要排除的类型   注解
-            expression：要排除哪个注解
-        用@Controller来注解的地方，Spring框架就不扫描了。因为Controller已由SpringMVC扫描了。
-
-        那能不能SpringMVC不扫描，让Spring统一来扫描呢？【答：不行】
-            必须让SpringMVC框架自己去扫描controller，
-            才能让web层用SpringMVC框架的方式来处理http请求与响应！
-    -->
+    <!--组件扫描-->
     <context:component-scan base-package="cn.leap">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
+
+    <!--======================配置数据源：C3P0  begin==========================-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <!--======================配置数据源：C3P0  end==========================-->
+
+
+    <!--======================Spring集成MyBatis  begin=========================
+        Spring容器接管SqlSession对象的创建权
+    -->
+    <!--配置sqlSession工厂
+        需要两个属性：
+            1）数据源   				SqlSession对象，数据源属性是必须的。没有会报错。
+            		BeanCreationException: Error creating bean with name 'sqlSessionFactory' defined in class
+            		path resource [applicationContext.xml]: Invocation of init method failed; nested exception
+            		is java.lang.IllegalArgumentException: Property 'dataSource' is required
+            	因此，还需要将数据源的配置，从MyBatis核心配置文件中，移到Spring核心配置文件中来。
+            2）MyBatis核心配置文件
+    -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--配置数据源-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--加载MyBatis核心配置文件-->
+        <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
+    </bean>
+    <!--扫描mapper包，为Mapper接口创建代理实现类对象-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--指定包-->
+        <property name="basePackage" value="cn.leap.mapper"/>
+    </bean>
+    <!--======================Spring集成MyBatis  end=========================-->
+
+
 </beans>

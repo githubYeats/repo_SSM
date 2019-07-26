@@ -1,6 +1,6 @@
 package cn.leap.mapper;
 
-import cn.leap.pojo.Account;
+import cn.leap.domain.Account;
 
 import java.util.List;
 
