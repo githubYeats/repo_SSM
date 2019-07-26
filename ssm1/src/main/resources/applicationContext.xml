@@ -37,6 +37,7 @@
             		path resource [applicationContext.xml]: Invocation of init method failed; nested exception
             		is java.lang.IllegalArgumentException: Property 'dataSource' is required
             	因此，还需要将数据源的配置，从MyBatis核心配置文件中，移到Spring核心配置文件中来。
+            	注意：之前数据源配置在MyBatis中时，用的是MyBatis内置的数据源。
             2）MyBatis核心配置文件
     -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -51,6 +52,41 @@
         <property name="basePackage" value="cn.leap.mapper"/>
     </bean>
     <!--======================Spring集成MyBatis  end=========================-->
+
+    <!--======================Spring事务控制：简化方式  begin=================-->
+    <!--1. 配置平台事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--====2. 配置通知  事务的增强      设置事务属性信息====
+        以注解代替：service层中业务方法上    以转账事务为例 transfer()
+        @Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED, readOnly = false)
+        下面这段xml配置，相当于@Transactional注解后括号中的属性信息
+    -->
+    <!--<tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="transfer" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false"/>
+        </tx:attributes>
+    </tx:advice>-->
+
+    <!--====3. 配置事务的AOP织入====
+        以注解代替：service层transfer()方法上
+        @Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED, readOnly = false)
+        下面这段xml配置，就相当于在transfer()方法加个“@Transactional”。
+            其中的切点表达式，是针对cn.yeats.service.impl包中所有方法的。
+            在转账案例中，此包下只写了一个transfer()方法
+    -->
+    <!--<aop:config>
+        <aop:pointcut id="txPointcut" expression="execution(* cn.yeats.service.impl.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config>-->
+
+    <!--====事务的注解驱动====
+        Spring事务控制注解配置中，替代上面第2步与第3步！        大大简化事务管理配置。
+    -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <!--======================Spring事务控制：简化方式  end==========================================-->
 
 
 </beans>

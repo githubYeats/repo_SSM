@@ -14,4 +14,79 @@
     	Service层中，SqlSession对象创建时，指定事务提交的方式
     		SqlSession sqlSession = sqlSessionFactory.openSession(true);//自动提交事务
 
-解决上述两个问题！
+
+主要解决上述两个问题！	还有部分小的调整，也要一并优化
+
+1. 将SqlSession对象交由Spring容器管理
+	Spring容器接管SqlSession对象的创建权！
+
+	<!--配置sqlSession工厂
+        需要两个属性：
+            1）数据源   				SqlSession对象，数据源属性是必须的。没有会报错。
+            		BeanCreationException: Error creating bean with name 'sqlSessionFactory' defined in class path resource [applicationContext.xml]: Invocation of init method failed; nested exception is java.lang.IllegalArgumentException: Property 'dataSource' is required
+            	因此，还需要将数据源的配置，从MyBatis核心配置文件中，移到Spring核心配置文件中来。
+            2）MyBatis核心配置文件
+    -->
+
+    <!--=========配置数据源：C3P0=============== -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--加载MyBatis核心配置文件-->
+        <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
+    </bean>
+    <!--扫描mapper包，为Mapper接口创建代理实现类对象-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--指定包-->
+        <property name="basePackage" value="cn.leap.mapper"/>
+    </bean>
+
+    SqlSession对象是MyBatis框架的入口，它的创建权被Spring接管，意味着MyBatis框架已经被集成到Spring框架中去了！
+
+2. 修改service层实现类的代码
+	不再需要初始化方法，去自己new出sqlSession对象了。
+	所需要的Mapper接口的实例Bean，直接用Spring注解，按类型注入即可。
+	（接口的代理实现类，已由MyBatis框架创建，并由Spring窗口接管了）
+
+	@Autowired
+    private AccountMapper accountMapper;
+
+    相应地业务方法中代码也要修改一下。
+3. 测试
+	启动项目，测试两项内容：
+	1）添加账户
+		请求URL：http://localhost:8080/ssm1/jsp/add.jsp
+
+	2）查询用户
+		请求URL：http://localhost:8080/ssm1/account/list
+
+	如果都能正确运行，说明Spring集成MyBatis就成功了。
+
+4. Spring接管事务管理
+	传统方式整合时，针对数据库的操作，事务是由MyBatis控制的。
+
+	Spring接管了MyBatis后，以上操作只是接管了MyBatis的SqlSession对象的创建权，
+	还并未接下“事务管理”！
+
+	Spring声明式事务控制
+		<!--===================Spring事务控制：简化方式  begin=======-->
+	    <!--配置平台事务管理器-->
+	    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	        <property name="dataSource" ref="dataSource"/>
+	    </bean>
+	    <!--事务的注解驱动-->
+	    <tx:annotation-driven transaction-manager="transactionManager"/>
+	    <!--===================Spring事务控制：简化方式  end=========-->
+
+	同样，再进行访问，进行测试！没有问题，说明SSM软整合就完成了！！
+
+
+
+
