@@ -15,7 +15,7 @@
         <!--设置项目构建使用的字符集-->
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 
-        <spring.version>5.0.5.RELEASE</spring.version>
+        <spring.version>5.2.3.RELEASE</spring.version>
         <mybatis.version>3.4.5</mybatis.version>
 
         <!--指定日志插件版本-->
